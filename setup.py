@@ -7,6 +7,7 @@
 import io
 import os
 import sys
+import unittest
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
@@ -129,5 +130,12 @@ setup(
         'sqlalchemy.dialects': [
             'rdsdataapi = sqlalchemy_rdsdataapi:RdsDataApiDialect',
         ],
-    }
+    },
+    #test_suite="setup.tests",
+    tests_require=["dbapi-compliance", "sqlalchemy"],
 )
+
+def tests():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover('tests', pattern='test_*.py')
+    return test_suite

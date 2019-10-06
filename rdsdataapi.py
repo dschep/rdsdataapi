@@ -1,6 +1,7 @@
-import time
 import numbers
 import boto3
+from datetime import date, datetime, time
+from time import localtime
 
 client = boto3.client("rds-data")
 
@@ -124,6 +125,18 @@ class Connection:
             database=self.database,
         )["transactionId"]
 
+    # Warnings as connection peroperties
+    Warning = Warning
+    Error = Error
+    InterfaceError = InterfaceError
+    DatabaseError = DatabaseError
+    DataError = DataError
+    OperationalError = OperationalError
+    IntegrityError = IntegrityError
+    InternalError = InternalError
+    ProgrammingError = ProgrammingError
+    NotSupportedError = NotSupportedError
+
 
 # https://www.python.org/dev/peps/pep-0249/#cursor-objects
 class Cursor:
@@ -131,6 +144,7 @@ class Cursor:
         self._connection = connection
         self.arraysize = 1
         self._rowcount = -1
+        self.result = None
 
     @property
     def connection(self):
@@ -138,17 +152,16 @@ class Cursor:
 
     @property
     def description(self):
-        if self.result is None:
+        if self.result is None or "columnMetadata" not in self.result:
             return None
-        from pprint import pprint
-        return [(col["name"], col["typeName"], None, None, None, None, None) for col in self.result["columnMetadata"]]
-        #return self.result.
+        return [
+            (col["name"], col["typeName"], None, None, None, None, None)
+            for col in self.result["columnMetadata"]
+        ]
 
     @property
     def rowcount(self):
         return self._rowcount
-
-    # no support for callproc
 
     def close(self):
         pass
@@ -169,7 +182,10 @@ class Cursor:
         )
         if self.connection.transaction_id is not None:
             boto_params["transactionId"] = self.connection.transaction_id
-        self.result = client.execute_statement(**boto_params)
+        try:
+            self.result = client.execute_statement(**boto_params)
+        except Exception as e:
+            raise self.connection.Error(e)
 
     def executemany(self, operation, seq_of_parameters):
         boto_params = dict(
@@ -184,36 +200,47 @@ class Cursor:
             resourceArn=self.connection.resource_arn,
             secretArn=self.connection.secret_arn,
             database=self.connection.database,
-            includeResultMetadata=True,
         )
         if self.connection.transaction_id is not None:
             boto_params["transactionId"] = self.connection.transaction_id
-        client.execute_statement(**boto_params)
+        try:
+            client.batch_execute_statement(**boto_params)
+        except Exception as e:
+            raise self.connection.Error(e)
 
     def fetchone(self):
-        if self.result is None or len(self.result["records"]) == 0:
+        if self.result is None or "records" not in self.result:
+            raise self.connection.Error("No result to fetch!")
+        try:
+            return [_python_type(col) for col in self.result["records"].pop(0)]
+        except IndexError:
             return None
-        return [_python_type(col) for col in self.result["records"].pop(0)]
 
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        if self.result is None or len(self.result["records"]) == 0:
-            return []
-        return [
-            [_python_type(col) for col in self.result["records"].pop(0)]
-            for record in range(size)
-        ]
+        if self.result is None or "records" not in self.result:
+            raise self.connection.Error("No result to fetch!")
+        result = []
+        for _ in range(size):
+            try:
+                result.append(
+                    [_python_type(col) for col in self.result["records"].pop(0)]
+                )
+            except IndexError:
+                pass
+        return result
 
     def fetchall(self):
-        if self.result is None or len(self.result["records"]) == 0:
-            return []
+        if self.result is None or "records" not in self.result:
+            raise self.connection.Error("No result to fetch!")
         try:
             return [
-                [_python_type(col) for col in record] for record in self.result["records"]
+                [_python_type(col) for col in record]
+                for record in self.result["records"]
             ]
         finally:
-            self.result = None
+            self.result["records"] = []
 
     def nextset(self):
         raise NotSupportedError
@@ -246,7 +273,7 @@ def Time(hour, minute, second):
 
 
 def Timestamp(year, month, day, hour, minute, second):
-    return Datetime(year, month, day, hour, minute, second)
+    return DATETIME(year, month, day, hour, minute, second)
 
 
 def DateFromTicks(ticks):
@@ -264,7 +291,12 @@ def TimestampFromTicks(ticks):
 def Binary(value):
     return value
 
+
+STRING = "varchar"
 BINARY = bytes
+NUMBER = numbers.Integral
+DATETIME = datetime
+ROWID = int
 
 
 # Interal utilities
