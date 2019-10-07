@@ -4,7 +4,7 @@
 
 The RDS Data API allows use of MySQL and PostgreSQL RDS databases via an HTTP API, making it ideal
 for use in AWS Lambda because it allow syou to use RDS without running your lambda in a VPC. This
-library wraps that API in both a [DB-API 2.0](https://www.python.org/dev/peps/pep-0249/) and
+library wraps that API in both a [DB-API 2.0](https://www.python.org/dev/peps/pep-0249/) driver and
 [SqlAlchemy](https://www.sqlalchemy.org/) dialect allowing you to tap into the vast python
 ecosystem for working with relational databases.
 
