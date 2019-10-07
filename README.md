@@ -17,7 +17,7 @@ pip install rdsdataapi
 
 ## Usage
 
-To use the lower-level DB-API 2.0 interface:
+To use the DB-API 2.0 interface:
 ```python
 from rdsdataapi import connect
 con = connect(
