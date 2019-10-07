@@ -31,7 +31,7 @@ class RdsDataApiTest(dbapi20.DatabaseAPI20Test):
         Per the upstream docstring, this test is of questionable utility. and it really doesn't
         mean much in the context of using the Data API since there isn't a peristent connection
         anyway.
-        https://github.com/baztian/dbapi-compliance/blob/c259a6ab3a90db89b40936a9a36745a0a6383d5e/dbapi20.py#L346kj
+        https://github.com/baztian/dbapi-compliance/blob/c259a6ab3a90db89b40936a9a36745a0a6383d5e/dbapi20.py#L346
         """
         pass
 
