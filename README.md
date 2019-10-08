@@ -21,9 +21,9 @@ To use the DB-API 2.0 interface:
 ```python
 from rdsdataapi import connect
 con = connect(
-    resource_arn="arn:aws:rds:us-east-1:490103061721:cluster:database-1",
-    secret_arn="arn:aws:secretsmanager:us-east-1:490103061721:secret:database-PI9BfJ",
-    database="mysql",
+    resource_arn="arn:aws:rds:us-east-1:490103061721:cluster:database-2",
+    secret_arn="arn:aws:secretsmanager:us-east-1:490103061721:secret:pgdb-gIucWr",
+    database="postgres",
 )
 cur = con.cursor()
 cur.execute("select :foo as bar", {"foo": "foobar"})
@@ -35,9 +35,9 @@ Or via SqlAlchemy:
 engine = create_engine(
     'rdsdataapi://',
     connect_args=dict(
-        secret_arn="arn:aws:secretsmanager:us-east-1:490103061721:secret:database-PI9BfJ",
-        resource_arn="arn:aws:rds:us-east-1:490103061721:cluster:database-1",
-        database="mysql"
+        resource_arn="arn:aws:rds:us-east-1:490103061721:cluster:database-2",
+        secret_arn="arn:aws:secretsmanager:us-east-1:490103061721:secret:pgdb-gIucWr",
+        database="postgres",
     )
 )
 with engine.connect() as con:
