@@ -47,3 +47,66 @@ class RdsDataApiTest(dbapi20.DatabaseAPI20Test):
     def test_setoutputsize(self):
         """ Not implemented. """
         pass
+
+    def _test_describe_type(self, db_type, dbapi20_type):
+        con = self._connect()
+        try:
+            cur = con.cursor()
+            cur.execute("create table %sbooze (name %s)" % (self.table_prefix, db_type))
+            self.assertEqual(
+                cur.description,
+                None,
+                "cursor.description should be none after executing a "
+                "statement that can return no rows (such as DDL)",
+            )
+            cur.execute("select name from %sbooze" % self.table_prefix)
+            self.assertEqual(
+                len(cur.description), 1, "cursor.description describes too many columns"
+            )
+            self.assertEqual(
+                len(cur.description[0]),
+                7,
+                "cursor.description[x] tuples must have 7 elements",
+            )
+            self.assertEqual(
+                cur.description[0][0].lower(),
+                "name",
+                "cursor.description[x][0] must return column name",
+            )
+            self.assertTrue(
+                cur.description[0][1] == dbapi20_type,
+                "cursor.description[x][1] must return column type. Got %r"
+                % cur.description[0][1],
+            )
+
+            # Make sure self.description gets reset
+            self.executeDDL2(cur)
+            self.assertEqual(
+                cur.description,
+                None,
+                "cursor.description not being set to None when executing "
+                "no-result statements (eg. DDL)",
+            )
+        finally:
+            con.close()
+
+    def test_describe_float(self):
+        self._test_describe_type("FLOAT", self.driver.NUMBER)
+
+    def test_describe_double(self):
+        self._test_describe_type("DOUBLE PRECISION", self.driver.NUMBER)
+
+    def test_describe_int(self):
+        self._test_describe_type("INT", self.driver.NUMBER)
+
+    def test_describe_bigint(self):
+        self._test_describe_type("BIGINT", self.driver.NUMBER)
+
+    def test_describe_text(self):
+        self._test_describe_type("TEXT", self.driver.STRING)
+
+    def test_describe_bytea(self):
+        self._test_describe_type("bytea", self.driver.BINARY)
+
+    def test_describe_timestamp(self):
+        self._test_describe_type("timestamp", self.driver.DATETIME)

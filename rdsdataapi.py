@@ -292,11 +292,27 @@ def Binary(value):
     return value
 
 
-STRING = "varchar"
-BINARY = bytes
-NUMBER = numbers.Integral
-DATETIME = datetime
-ROWID = int
+class DbType:
+    def __init__(self, *types):
+        self.types = types
+
+    def __eq__(self, other):
+        return other in self.types
+
+
+class DatetimeDbType(DbType):
+    """ DATETIME has to both behave as `datetime.datetime` and equal to it's db_type"""
+
+    def __call__(self, *args, **kwargs):
+        return datetime(*args, **kwargs)
+
+
+STRING = DbType("varchar", "text")
+BINARY = DbType("bytea")
+NUMBER = DbType("float4", "float8", "int4", "int8")
+
+DATETIME = DatetimeDbType("timestamp")
+ROWID = DbType()
 
 
 # Interal utilities
@@ -307,7 +323,6 @@ def _python_type(value_dict):
 
 
 def _aws_type(value):
-    # TODO - how to detect blob in python 2?
     if isinstance(value, str):
         return {"stringValue": value}
     if isinstance(value, bytes):

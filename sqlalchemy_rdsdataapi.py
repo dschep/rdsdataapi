@@ -1,14 +1,15 @@
 from sqlalchemy.dialects import registry
 from sqlalchemy.engine.default import DefaultDialect
+
 try:
-    from urllib.parse import urlparse, unquote # python 3
+    from urllib.parse import urlparse, unquote  # python 3
 except ImportError:
-    from urlparse import urlparse, unquote # python 2
+    from urlparse import urlparse, unquote  # python 2
 
 
 class RdsDataApiDialect(DefaultDialect):
-    name = 'rdsdataapi'
-    driver = 'rdsdataapi'
+    name = "rdsdataapi"
+    driver = "rdsdataapi"
 
     @classmethod
     def dbapi(cls):
@@ -27,7 +28,6 @@ class RdsDataApiDialect(DefaultDialect):
     def _check_unicode_returns(self, connection):
         return True
 
+
 def register():
-    registry.register(
-        "rdsdataapi", "sqlalchemy_rdsdataapi", "RdsDataApiDialect"
-    )
+    registry.register("rdsdataapi", "sqlalchemy_rdsdataapi", "RdsDataApiDialect")
