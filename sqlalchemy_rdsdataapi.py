@@ -1,3 +1,4 @@
+from sqlalchemy.dialects import registry
 from sqlalchemy.engine.default import DefaultDialect
 try:
     from urllib.parse import urlparse, unquote # python 3
