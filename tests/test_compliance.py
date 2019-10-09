@@ -1,15 +1,20 @@
 import dbapi20
 import rdsdataapi
+import boto3
+
+ssm = boto3.client("ssm")
+
+params = ssm.get_parameters(
+    Names=["/rdsdataapi/resource_arn", "/rdsdataapi/secret_arn", "/rdsdataapi/database"]
+)["Parameters"]
 
 
 class RdsDataApiTest(dbapi20.DatabaseAPI20Test):
     driver = rdsdataapi
     connect_args = ()
-    connect_kw_args = dict(
-        resource_arn="arn:aws:rds:us-east-1:490103061721:cluster:database-2",
-        secret_arn="arn:aws:secretsmanager:us-east-1:490103061721:secret:pgdb-gIucWr",
-        database="postgres",
-    )
+    connect_kw_args = {
+        param["Name"].rsplit("/", 1)[1]: param["Value"] for param in params
+    }
 
     def setUp(self):
         self.tearDown()  # builtin teardown cleans up, do it before too.
