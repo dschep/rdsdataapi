@@ -1,5 +1,8 @@
 ## DB-API 2.0 driver & SqlAlchemy dialect for the AWS RDS Data API
 
+[![Test Status](https://github.com/dschep/rdsdataapi/workflows/Test/badge.svg)](https://github.com/dschep/rdsdataapi/actions)
+![PyPI](https://img.shields.io/pypi/v/rdsdataapi)
+
 **NOTE: This is currently ALPHA quality software and has not been thoroughly tested yet**
 
 The RDS Data API allows use of MySQL and PostgreSQL RDS databases via an HTTP API, making it ideal
