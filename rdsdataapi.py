@@ -11,7 +11,7 @@ __all__ = [
     "apilevel",
     "connect",
     "paramstyle",
-    "threadsafety"
+    "threadsafety",
     # exceptions
     "Warning",
     "Error",
@@ -319,4 +319,4 @@ def _aws_type(value):
     if isinstance(value, numbers.Integral):
         return {"longValue": value}
     if value is None:
-        return {"isNull": true}
+        return {"isNull": True}
