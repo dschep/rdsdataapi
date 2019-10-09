@@ -1,4 +1,4 @@
-# DB-API 2.0 driver & SqlAlchemy dialect for the AWS RDS Data API
+## DB-API 2.0 driver & SqlAlchemy dialect for the AWS RDS Data API
 
 **NOTE: This is currently ALPHA quality software and has not been thoroughly tested yet**
 
@@ -9,13 +9,13 @@ library wraps that API in both a [DB-API 2.0](https://www.python.org/dev/peps/pe
 ecosystem for working with relational databases.
 
 
-## Installation
+### Installation
 ```
 pip install rdsdataapi
 ```
 
 
-## Usage
+### Usage
 
 To use the DB-API 2.0 interface:
 ```python
