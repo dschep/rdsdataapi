@@ -1,3 +1,7 @@
+# ABANDONED
+I never had time to get this past a proof of concept stage, check out:
+https://github.com/chanzuckerberg/sqlalchemy-aurora-data-api
+
 ## DB-API 2.0 driver & SqlAlchemy dialect for the AWS RDS Data API
 
 [![Test Status](https://github.com/dschep/rdsdataapi/workflows/Test/badge.svg)](https://github.com/dschep/rdsdataapi/actions)
